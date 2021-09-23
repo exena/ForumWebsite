@@ -21,7 +21,8 @@
         <tbody>
         <tr th:each="board : ${boards}">
             <td th:text="${board.id}">O</td>
-            <td> <a th:text="${board.title}" th:href="@{/board/form(id=${board.id})}">O</a></td>
+            <td> <a th:text="${board.title}" th:href="@{'/board/'+${board.id}}">O</a></td>
+<!--            <td> <a th:text="${board.title}" th:href="@{/board/form(id=${board.id})}">O</a></td>-->
             <td>홍길동</td>
         </tr>
         </tbody>

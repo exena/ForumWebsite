@@ -45,4 +45,11 @@ public class BoardController {
         boardRepository.save(board);
         return "redirect:/board/list";
     }
+
+    @GetMapping("/{id}")
+    public String view(Model model, @PathVariable Long id){
+        Board board = boardRepository.findById(id).orElse(null);
+        model.addAttribute("board", board);
+        return "board/view";
+    }
 }
