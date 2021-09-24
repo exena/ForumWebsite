@@ -73,7 +73,7 @@
             type : "POST",
             url : "/uploadSummernoteImageFile",
             contentType : false,
-<!--        enctype : 'multipart/form-data',-->
+            enctype : 'multipart/form-data',
             processData : false,
             success : function(data) {
                 $(editor).summernote('insertImage', data.url);
