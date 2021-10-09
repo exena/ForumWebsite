@@ -9,7 +9,7 @@
 
 <div class="container">
     <h2>게시판</h2>
-    <form action="#" th:action="@{/board/form}" th:object="${board}" method="post">
+    <form action="#" th:action="@{/board/form}" th:object="${board}" method="post" id="EntireForm">
         <input type="hidden" th:field="*{id}">
         <div class="form-group">
             <label for="title">제목</label>
@@ -19,13 +19,13 @@
                 제목이 형식과 다름
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="FormBody">
             <label for="summernote">내용</label>
             <textarea id="summernote" name="editordata" th:field="*{content}"></textarea>
         </div>
         <div class="text-right">
             <a type="button" class="btn btn-primary" th:href="@{/board/list}">취소</a>
-            <button type="submit" class="btn btn-primary">확인</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">확인</button>
         </div>
     </form>
 </div>
@@ -41,45 +41,121 @@
 <script src="/summernote-0.8.18-dist/summernote-lite.js"></script>
 <script src="/summernote-0.8.18-dist/lang/summernote-ko-KR.js"></script>
 <script>
-	var setting = {
-            height : 300,
-            lang : 'ko-KR',
-            callbacks : {	//여기 부분이 이미지를 첨부하는 부분
-					onImageUpload : function(files) {
-						for (var i = files.length - 1; i >= 0; i--) {
-                            uploadSummernoteImageFile(files[i],
-                            this);
-                        }
-					},
-					onPaste: function (e) {
-						var clipboardData = e.originalEvent.clipboardData;
-						if (clipboardData && clipboardData.items && clipboardData.items.length) {
-							var item = clipboardData.items[0];
-							if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
-								e.preventDefault();
-							}
-						}
-					}
-            }
-
-    };
-    $('#summernote').summernote(setting);
-
-    function uploadSummernoteImageFile(file, editor) {
-        data = new FormData();
-        data.append("file", file);
-        $.ajax({
-            data : data,
-            type : "POST",
-            url : "/uploadSummernoteImageFile",
-            contentType : false,
-            enctype : 'multipart/form-data',
-            processData : false,
-            success : function(data) {
-                $(editor).summernote('insertImage', data.url);
-            }
-        });
+//onsubmit에서 내용 변경을 적용하는 플러그인.
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('jquery'));
+  } else {
+    factory(window.jQuery);
+  }
+}(function ($) {
+  $.extend($.summernote.plugins, {
+    'applyChange': function (context) {
+      var $note     = context.layoutInfo.note
+      this.apply = function () {
+        $note.val(context.invoke('code'));
+        $note.change();
+      };
+      document.getElementById('EntireForm').addEventListener('submit',this.apply);
     }
+  });
+}));
+
+//섬머노트 세팅
+var setting = {
+    height : 1000,
+    lang : 'ko-KR',
+    callbacks : {
+            //이미지 복붙 중복방지? 필요없을듯 아마.
+            onPaste: function (e) {
+                var clipboardData = e.originalEvent.clipboardData;
+                if (clipboardData && clipboardData.items && clipboardData.items.length) {
+                    var item = clipboardData.items[0];
+                    if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+                        e.preventDefault();
+                    }
+                }
+            }
+    }
+};
+$('#summernote').summernote(setting);
+
+//base64로 들어간 이미지의 갯수를 리턴하는 함수.
+function getImgs2ConvNum() {
+    var count = 0;
+    var ee = document.getElementsByClassName('note-editor');
+    var imgList = ee[0].getElementsByTagName("img");
+    var imgArray = Array.prototype.slice.call(imgList);
+    imgArray.forEach(function(img,index){
+        //if image is not a url link
+        if(img.src.substr( 0, 5) == 'data:'){
+            count++;
+        }
+    });
+    return count;
+}
+
+//스캔 및 변환. base64인 모든 이미지를 URI2Blob함수에서 파일화시키고 업로드 함수로 보냄.
+function scanConvAllImages() {
+    var ee = document.getElementsByClassName('note-editor');
+    var imgList = ee[0].getElementsByTagName("img");
+    var imgArray = Array.prototype.slice.call(imgList);
+    imgArray.forEach(function(img,index){
+        //if image is not a url link
+        if(img.src.substr( 0, 5) == 'data:'){
+            const uploadableImage = DataURIToBlob(img.src);
+            uploadSummernoteImageFile(uploadableImage, img);
+        }
+    });
+}
+
+//제출버튼을 누르면 작동하는 함수. 이미지가 있을경우 결과적으로 이미지업로드함수에서 requestSubmit을 함.
+function submitForm()
+{
+    var imgs2ConvNum = getImgs2ConvNum();
+    if(imgs2ConvNum==0){
+        document.getElementById('EntireForm').requestSubmit();
+    }
+    else{
+        scanConvAllImages();
+    }
+};
+
+//URI2Blob함수. base64 스트링을 이미지 파일화함.
+function DataURIToBlob(dataURI) {
+    const splitDataURI = dataURI.split(',')
+    const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+    const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+
+    const ia = new Uint8Array(byteString.length)
+    for (let i = 0; i < byteString.length; i++)
+        ia[i] = byteString.charCodeAt(i)
+
+    return new Blob([ia], { type: mimeString })
+}
+
+//이미지업로드함수. 모든 이미지가 업로드된 경우엔 제출submit요청을 보냄.
+function uploadSummernoteImageFile(uploadableImage, imgElement) {
+    data = new FormData();
+    data.append("file", uploadableImage, imgElement.getAttribute('data-filename'));
+    $.ajax({
+        data : data,
+        type : "POST",
+        url : "/uploadSummernoteImageFile",
+        contentType : false,
+        enctype : 'multipart/form-data',
+        processData : false,
+        success : function(data) {
+            imgElement.src = data.url;
+            imgElement.removeAttribute('style');
+            if(getImgs2ConvNum()==0){
+                document.getElementById('EntireForm').requestSubmit();
+            }
+        }
+    });
+}
 </script>
 <!--  -->
 </body>

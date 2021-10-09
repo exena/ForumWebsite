@@ -24,6 +24,7 @@
             <td> <a th:text="${board.title}" th:href="@{'/board/'+${board.id}}">O</a></td>
 <!--            <td> <a th:text="${board.title}" th:href="@{/board/form(id=${board.id})}">O</a></td>-->
             <td>홍길동</td>
+            <a th:href="@{'/board/form/?id='+${board.id}}"><i class="bi bi-brush"></i></a>
         </tr>
         </tbody>
     </table>
