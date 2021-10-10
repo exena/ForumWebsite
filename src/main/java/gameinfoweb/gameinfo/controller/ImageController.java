@@ -5,6 +5,7 @@ import gameinfoweb.gameinfo.model.Image;
 import gameinfoweb.gameinfo.repository.ImageRepository;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -27,19 +28,22 @@ import java.util.List;
 @RequestMapping("/summernoteImage")
 public class ImageController {
 
+    @Value("${image-folder-path}")
+    private String imgfolderpath;
+
     @Autowired
     private ImageRepository imageRepository;
 
     @GetMapping(value = "/{imagename}",produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE})
     public ResponseEntity<byte[]> getImage(@PathVariable("imagename") String imagename) throws IOException {
-        InputStream imageStream = new FileInputStream("/home/osusml2135/summernote_image/" + imagename);
-        //"/home/osusml2135/summernote_image/"
-        //"C:/summernote_image/"
+
+        InputStream imageStream = new FileInputStream("C:\\summernote_image\\"+ imagename);
+
         byte[] imageByteArray = IOUtils.toByteArray(imageStream);
         imageStream.close();
-        List<Image> imageList = imageRepository.findByFilename(imagename);
-        if (imageList.size() != 0) {
-            imagename = imageList.get(0).getOriginalname();
+        Image image = imageRepository.findByFileName(imagename);
+        if (image != null) {
+            imagename = image.getOriginalName();
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("inline")

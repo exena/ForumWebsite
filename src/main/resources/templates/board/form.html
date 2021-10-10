@@ -10,7 +10,8 @@
 <div class="container">
     <h2>게시판</h2>
     <form action="#" th:action="@{/board/form}" th:object="${board}" method="post" id="EntireForm">
-        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{id}" id="formId">
+<!--        <input type="hidden" th:field="*{images}" id="ImagesList">-->
         <div class="form-group">
             <label for="title">제목</label>
             <input type="text" class="form-control"
@@ -30,8 +31,7 @@
     </form>
 </div>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -82,12 +82,17 @@ var setting = {
 };
 $('#summernote').summernote(setting);
 
-//base64로 들어간 이미지의 갯수를 리턴하는 함수.
-function getImgs2ConvNum() {
-    var count = 0;
+//이미지 배열을 리턴
+function getImgArray(){
     var ee = document.getElementsByClassName('note-editor');
     var imgList = ee[0].getElementsByTagName("img");
     var imgArray = Array.prototype.slice.call(imgList);
+    return imgArray;
+}
+//base64로 들어간 이미지의 갯수를 리턴하는 함수.
+function getImgs2ConvNum() {
+    var count = 0;
+    var imgArray = getImgArray();
     imgArray.forEach(function(img,index){
         //if image is not a url link
         if(img.src.substr( 0, 5) == 'data:'){
@@ -97,29 +102,40 @@ function getImgs2ConvNum() {
     return count;
 }
 
-//스캔 및 변환. base64인 모든 이미지를 URI2Blob함수에서 파일화시키고 업로드 함수로 보냄.
-function scanConvAllImages() {
-    var ee = document.getElementsByClassName('note-editor');
-    var imgList = ee[0].getElementsByTagName("img");
-    var imgArray = Array.prototype.slice.call(imgList);
-    imgArray.forEach(function(img,index){
-        //if image is not a url link
-        if(img.src.substr( 0, 5) == 'data:'){
-            const uploadableImage = DataURIToBlob(img.src);
-            uploadSummernoteImageFile(uploadableImage, img);
-        }
-    });
-}
-
 //제출버튼을 누르면 작동하는 함수. 이미지가 있을경우 결과적으로 이미지업로드함수에서 requestSubmit을 함.
 function submitForm()
 {
     var imgs2ConvNum = getImgs2ConvNum();
     if(imgs2ConvNum==0){
         document.getElementById('EntireForm').requestSubmit();
+
     }
     else{
-        scanConvAllImages();
+        var form = document.getElementById('EntireForm');
+        var formData = $(form).serialize();
+        formData = formData.split("&content=")[0];
+        $.ajax({
+            cache : false,
+            url : "/board/prepost",
+            type : 'POST',
+            data : formData,
+            success : function(data) {
+                var board = JSON.parse(data.savedBoard)
+                document.getElementById('formId').value = board.id;
+                //스캔 및 변환. base64인 모든 이미지를 URI2Blob함수에서 파일화시키고 업로드 함수로 보냄.
+                var imgArray = getImgArray();
+                imgArray.forEach(function(img,index){
+                    //if image is not a url link
+                    if(img.src.substr( 0, 5) == 'data:'){
+                        const uploadableImage = DataURIToBlob(img.src);
+                        uploadSummernoteImageFile(uploadableImage, img, board.id);
+                    }
+                });
+            },
+            error : function(xhr, status) {
+                alert(xhr + " : " + status);
+            }
+        });
     }
 };
 
@@ -137,9 +153,10 @@ function DataURIToBlob(dataURI) {
 }
 
 //이미지업로드함수. 모든 이미지가 업로드된 경우엔 제출submit요청을 보냄.
-function uploadSummernoteImageFile(uploadableImage, imgElement) {
+function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
     data = new FormData();
     data.append("file", uploadableImage, imgElement.getAttribute('data-filename'));
+    data.append("formId", formId);
     $.ajax({
         data : data,
         type : "POST",
@@ -154,6 +171,7 @@ function uploadSummernoteImageFile(uploadableImage, imgElement) {
                 document.getElementById('EntireForm').requestSubmit();
             }
         }
+        //error:
     });
 }
 </script>

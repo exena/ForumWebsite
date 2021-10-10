@@ -1,5 +1,7 @@
 package gameinfoweb.gameinfo.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import gameinfoweb.gameinfo.model.Board;
 import gameinfoweb.gameinfo.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +38,22 @@ public class BoardController {
         return "board/form";
     }
 
+    @PostMapping(value = "/prepost", produces = "application/json; charset=utf8")
+    @ResponseBody
+    public JsonObject prepost(@Valid Board board, BindingResult bindingResult){
+        JsonObject jsonObject = new JsonObject();
+        if(bindingResult.hasErrors()){
+            jsonObject.addProperty("responseCode", "error");
+            return jsonObject;
+        }
+        Board savedBoard = boardRepository.save(board);
+        jsonObject.addProperty("responseCode", "success");
+        jsonObject.addProperty("savedBoard", new Gson().toJson(savedBoard));
+        return jsonObject;
+    }
     @PostMapping("/form")
-    public String greetingSubmit(@Valid Board board, BindingResult bindingResult) {
-        if(bindingResult.hasErrors())
-        {
+    public String postForm(@Valid Board board, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
             return "board/form";
         }
         boardRepository.save(board);
