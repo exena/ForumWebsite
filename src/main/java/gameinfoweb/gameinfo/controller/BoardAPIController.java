@@ -1,19 +1,30 @@
 package gameinfoweb.gameinfo.controller;
 
 import gameinfoweb.gameinfo.model.Board;
+import gameinfoweb.gameinfo.model.Image;
 import gameinfoweb.gameinfo.repository.BoardRepository;
+import gameinfoweb.gameinfo.repository.ImageRepository;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
+import java.io.File;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 class BoardAPIController {
 
+    @Value("${image-folder-path}")
+    private String imgfolderpath;
+
     @Autowired
     private BoardRepository repository;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     // Aggregate root
     // tag::get-aggregate-root[]
@@ -58,6 +69,19 @@ class BoardAPIController {
 
     @DeleteMapping("/boards/{id}")
     void deleteBoard(@PathVariable Long id) {
-        repository.deleteById(id);
+        try {
+            List<Image> images = repository.findById(id).orElse(null).getImages();
+            images.forEach(image -> {
+                String fileRoot = imgfolderpath;
+                File targetFile = new File(fileRoot + image.getFileName());
+                FileUtils.deleteQuietly(targetFile);
+                imageRepository.delete(image);
+            });
+            repository.deleteById(id);
+
+        }catch(NullPointerException e){
+
+        }
+
     }
 }
