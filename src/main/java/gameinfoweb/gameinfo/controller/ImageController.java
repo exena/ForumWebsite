@@ -37,7 +37,7 @@ public class ImageController {
     @GetMapping(value = "/{imagename}",produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE})
     public ResponseEntity<byte[]> getImage(@PathVariable("imagename") String imagename) throws IOException {
 
-        InputStream imageStream = new FileInputStream("C:\\summernote_image\\"+ imagename);
+        InputStream imageStream = new FileInputStream(imgfolderpath+ imagename);
 
         byte[] imageByteArray = IOUtils.toByteArray(imageStream);
         imageStream.close();
