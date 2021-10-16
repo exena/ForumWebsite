@@ -56,7 +56,14 @@ public class BoardController {
         if(bindingResult.hasErrors()){
             return "board/form";
         }
-        boardRepository.save(board);
+        //새로 만들때
+        if(board.getId() == null) {
+            boardRepository.save(board);
+        }
+        //수정할때
+        else{
+            boardRepository.save(board);
+        }
         return "redirect:/board/list";
     }
 

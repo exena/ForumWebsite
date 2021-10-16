@@ -1,4 +1,4 @@
-<!doctype html >
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/common :: head('게시판')">
 
@@ -8,65 +8,21 @@
 </nav>
 
 <div class="container">
+    <h2>게시판</h2>
     <form action="#" th:action="@{/board/form}" th:object="${board}" method="post" id="EntireForm">
         <input type="hidden" th:field="*{id}" id="formId">
-        <!--<input type="hidden" th:field="*{images}" id="ImagesList">-->
-        <div id="toolbar">
-            <!-- Add font size dropdown -->
-            <span class="ql-formats">
-                <select class="ql-font"></select>
-                <select class="ql-size"></select>
-            </span>
-            <!-- Add a bold button -->
-            <span class="ql-formats">
-                <button class="ql-bold"></button>
-                <button class="ql-italic"></button>
-                <button class="ql-underline"></button>
-                <button class="ql-strike"></button>
-            </span>
-            <!-- Add font color dropdown -->
-            <span class="ql-formats">
-                <select class="ql-color"></select>
-                <select class="ql-background"></select>
-            </span>
-            <!-- Add subscript and superscript buttons -->
-            <span class="ql-formats">
-                <button class="ql-script" value="sub"></button>
-                <button class="ql-script" value="super"></button>
-            </span>
-            <!-- Add text alignment dropdown -->
-            <span class="ql-formats">
-                <button class="ql-direction"></button>
-                <select class="ql-align"></select>
-            </span>
-            <!-- Add image button -->
-            <span class="ql-formats">
-                <button class="ql-link"></button>
-                <button class="ql-image"></button>
-                <button class="ql-video"></button>
-            </span>
-            <!-- Add code-block button -->
-            <span class="ql-formats">
-                <button class="ql-blockquote"></button>
-                <button class="ql-code-block"></button>
-            </span>
-            <!-- Add clean button -->
-            <span class="ql-formats">
-                <button class="ql-clean"></button>
-            </span>
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-            <input style="border-width: 0 1px; font-size: 20px; box-sizing: border-box; padding: 15px; width: 100%" placeholder="제목"
-                   type="text" class="ql-container ql-snow" th:classappend="${#fields.hasErrors('title')}? 'is-invalid'" id="title" th:field="*{title}">
+        <!--        <input type="hidden" th:field="*{images}" id="ImagesList">-->
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" class="form-control"
+                   th:classappend="${#fields.hasErrors('title')}? 'is-invalid'" id="title" th:field="*{title}">
             <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
                 제목이 형식과 다름
             </div>
         </div>
         <div class="form-group" id="FormBody">
-            <!--This textarea will not be shown to user. (Quill adds bootstrap d-none class)-->
-            <textarea name="input" class="quill-editor" th:field="*{content}">
-                <p>Hello World!</p>
-            </textarea>
+            <label for="summernote">내용</label>
+            <textarea id="summernote" name="editordata" th:field="*{content}"></textarea>
         </div>
         <div class="text-right">
             <a type="button" class="btn btn-primary" th:href="@{/board/list}">취소</a>
@@ -81,19 +37,54 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script src="/image-resize.min.js"></script>
-<script src="/quill-config.js"></script>
+<link href="/summernote-0.8.18-dist/summernote-lite.css" rel="stylesheet">
+<script src="/summernote-0.8.18-dist/summernote-lite.js"></script>
+<script src="/summernote-0.8.18-dist/lang/summernote-ko-KR.js"></script>
 <script>
-// summernote : 'note-editor'
-// quill: 'ql-editor'
-var editable_part_class_name = 'ql-editor';
+//onsubmit에서 내용 변경을 적용하는 플러그인.
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('jquery'));
+  } else {
+    factory(window.jQuery);
+  }
+}(function ($) {
+  $.extend($.summernote.plugins, {
+    'applyChange': function (context) {
+      var $note     = context.layoutInfo.note
+      this.apply = function () {
+        $note.val(context.invoke('code'));
+        $note.change();
+      };
+      document.getElementById('EntireForm').addEventListener('submit',this.apply);
+    }
+  });
+}));
 
+//섬머노트 세팅
+var setting = {
+    height : 1000,
+    lang : 'ko-KR',
+    callbacks : {
+            //이미지 복붙 중복방지? 필요없을듯 아마.
+            onPaste: function (e) {
+                var clipboardData = e.originalEvent.clipboardData;
+                if (clipboardData && clipboardData.items && clipboardData.items.length) {
+                    var item = clipboardData.items[0];
+                    if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+                        e.preventDefault();
+                    }
+                }
+            }
+    }
+};
+$('#summernote').summernote(setting);
 
 //이미지 배열을 리턴
 function getImgArray(){
-    var ee = document.getElementsByClassName(editable_part_class_name);
+    var ee = document.getElementsByClassName('note-editor');
     var imgList = ee[0].getElementsByTagName("img");
     var imgArray = Array.prototype.slice.call(imgList);
     return imgArray;
@@ -117,15 +108,14 @@ function submitForm()
     var imgs2ConvNum = getImgs2ConvNum();
     //새로 업로드해야할 이미지가 없는 경우.
     if(imgs2ConvNum==0){
-        //이미지가 없을경우 그냥 제출한다.
         document.getElementById('EntireForm').requestSubmit();
 
     }
     //이미지를 업로드해야하는 경우.
     else{
         //수정이 아닌 경우. (새로 글을 쓰는 경우)
-        //일단 content를 null로 해서 제목만 보내고
         if(document.getElementById('formId').value == ''){
+            //미리 제목만 보내놓고 id를 받아와서 이미지를 업로드하면서 맵핑.
             var form = document.getElementById('EntireForm');
             var formData = $(form).serialize();
             formData = formData.split("&content=")[0];
@@ -135,7 +125,6 @@ function submitForm()
                 type : 'POST',
                 data : formData,
                 success : function(data) {
-                    //게시글 id를 받은후 이미지를 업로드하면서 id와 함께 데이터베이스에 보내서 맵핑한다.
                     var board = JSON.parse(data.savedBoard)
                     document.getElementById('formId').value = board.id;
                     //스캔 및 변환. base64인 모든 이미지를 URI2Blob함수에서 파일화시키고 업로드 함수로 보냄.
@@ -185,7 +174,7 @@ function DataURIToBlob(dataURI) {
 //이미지업로드함수. 모든 이미지가 업로드된 경우엔 제출submit요청을 보냄.
 function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
     data = new FormData();
-    data.append("file", uploadableImage, imgElement.getAttribute('alt'));
+    data.append("file", uploadableImage, imgElement.getAttribute('data-filename'));
     data.append("formId", formId);
     $.ajax({
         data : data,
@@ -196,6 +185,7 @@ function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
         processData : false,
         success : function(data) {
             imgElement.src = data.url;
+            imgElement.removeAttribute('style');
             if(getImgs2ConvNum()==0){
                 document.getElementById('EntireForm').requestSubmit();
             }
