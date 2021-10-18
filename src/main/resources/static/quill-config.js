@@ -24,17 +24,10 @@
 //Quill.register(Image, true);
 //**********************************************************************************************
 //image resizer module
-//Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
-//class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
-//    getActions() {
-//        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
-//    }
-//}
-Quill.register('modules/blotFormatter', BlotFormatter);
-
-class CustomImageSpec extends BlotFormatter.ImageSpec {
+Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
+class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
     getActions() {
-        return [BlotFormatter.AlignAction, BlotFormatter.ResizeAction];
+        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
     }
 }
 //**********************************************************************************************
