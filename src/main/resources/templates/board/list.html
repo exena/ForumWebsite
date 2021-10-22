@@ -9,7 +9,6 @@
 
 <div class="container">
     <h2>게시판</h2>
-    <div>총 보드수: <span th:text="${#lists.size(boards)}"></span></div>
     <table class="table table-striped">
         <thead>
         <tr>
@@ -36,6 +35,19 @@
         </tr>
         </tbody>
     </table>
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${1 == startPage}? 'disabled'">
+                <a class="page-link" th:href="@{/board/list(page=${boards.pageable.pageNumber - 4})}" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item" th:classappend="${i == boards.pageable.pageNumber + 1}? 'disabled'" th:each="i: ${#numbers.sequence(startPage,endPage)}">
+                <a class="page-link" th:href="@{/board/list(page=${i})}" th:text="${i}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${boards.totalPages == endPage}? 'disabled'">
+                <a class="page-link" th:href="@{/board/list(page=(${boards.pageable.pageNumber + 6}>${boards.totalPages})? ${boards.totalPages} : ${boards.pageable.pageNumber + 6})}">Next</a>
+            </li>
+        </ul>
+    </nav>
     <div class="text-right">
         <a type="button" class="btn btn-primary" th:href="@{/board/form}">쓰기</a>
     </div>

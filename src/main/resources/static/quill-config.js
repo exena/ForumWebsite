@@ -27,7 +27,7 @@
 Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
     getActions() {
-        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
+        return [QuillBlotFormatter.AlignAction];//, QuillBlotFormatter.ResizeAction
     }
 }
 //**********************************************************************************************
@@ -39,7 +39,7 @@ class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
 //textarea quill editor
 $('.quill-editor').each(function(i, el) {//index, element
     var el = $(this), id = 'quilleditor-' + i, val = el.val(), editor_height = '100%';
-    var div = $('<div/>').attr('id', id).css('height', editor_height).html(val);
+    var div = $('<div/>').attr('id', id).css('height', editor_height).css('font-size', '16px').html(val);
     el.addClass('d-none');
     el.parent().append(div);
 

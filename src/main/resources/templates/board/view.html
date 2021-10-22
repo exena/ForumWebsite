@@ -7,13 +7,45 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragments/common :: menu(null)">
 </nav>
 
-<div class="container">
+<div class="container" id="container1">
     <h2 th:text="${board.title}">글제목</h2>
+    <br>
     <p th:utext="${board.content}">글내용</p>
 </div>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script>
+limitAllImgsMaxWidth();
+removesAllPsMargin();
+//이미지 배열을 리턴
+function getImgArray(){
+    var container = document.getElementById("container1");
+    var imgList = container.getElementsByTagName("img");
+    var imgArray = Array.prototype.slice.call(imgList);
+    return imgArray;
+}
+//모든 이미지의 최대폭을 컨테이너폭에 맞춘다.
+function limitAllImgsMaxWidth() {
+    var imgArray = getImgArray();
+    imgArray.forEach(function(img,index){
+        img.style.maxWidth="100%";
+    });
+}
+//p태그 배열을 리턴
+function getPArray(){
+    var container = document.getElementById("container1");
+    var pList = container.getElementsByTagName("p");
+    var pArray = Array.prototype.slice.call(pList);
+    return pArray;
+}
+//모든 p태그의 마진을 없앤다.
+function removesAllPsMargin() {
+    var pArray = getPArray();
+    pArray.forEach(function(p,index){
+        p.style.margin = '0 0 4px';
+    });
+}
+</script>
+
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
