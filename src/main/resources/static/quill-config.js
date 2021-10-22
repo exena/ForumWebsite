@@ -24,12 +24,12 @@
 //Quill.register(Image, true);
 //**********************************************************************************************
 //image resizer module
-Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
-class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
-    getActions() {
-        return [QuillBlotFormatter.AlignAction];//, QuillBlotFormatter.ResizeAction
-    }
-}
+//Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
+//class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
+//    getActions() {
+//        return [QuillBlotFormatter.AlignAction];//, QuillBlotFormatter.ResizeAction
+//    }
+//}
 //**********************************************************************************************
 //var quill = new Quill('#editor', {
 //    //modules:{ toolbar: [ ['image','code-block'] ] },
@@ -44,7 +44,7 @@ $('.quill-editor').each(function(i, el) {//index, element
     el.parent().append(div);
 
     var quill = new Quill('#' + id, {
-        modules:{ toolbar: '#toolbar', blotFormatter: { specs: [ CustomImageSpec ] }},
+        modules:{ toolbar: '#toolbar'},
         theme: 'snow'
     });
 //    quill.on('text-change', function() {
