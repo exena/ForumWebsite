@@ -1,7 +1,5 @@
 package gameinfoweb.gameinfo.imageuploader;
 
-
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import gameinfoweb.gameinfo.model.Image;
 import gameinfoweb.gameinfo.repository.BoardRepository;

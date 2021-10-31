@@ -5,18 +5,20 @@ import com.google.gson.annotations.Expose;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Entity
 @Data
-public class Image {
+@Entity
+public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String fileName;
-    private String originalName;
 
-    @ManyToOne
-    @JoinColumn(name="board_id", referencedColumnName = "id")
+    private String name;
+
+    @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private Board board;
+    private List<User> users;
+
 }

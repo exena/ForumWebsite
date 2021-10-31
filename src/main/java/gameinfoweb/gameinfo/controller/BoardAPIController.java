@@ -7,6 +7,7 @@ import gameinfoweb.gameinfo.repository.ImageRepository;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
@@ -68,8 +69,15 @@ class BoardAPIController {
     }
 
     @DeleteMapping("/boards/{id}")
-    void deleteBoard(@PathVariable Long id) {
+    void deleteBoard(@PathVariable Long id, Authentication authentication) {
         try {
+            Board b = repository.findById(id).orElseThrow();
+            String bn = b.getUser().getUsername();
+            String n = authentication.getName();
+            if(!n.equals(bn)) {
+                //Maybe orElse(null).getUser also can throw NoSuchElementException.
+                throw new SecurityException("Different username");
+            }
             List<Image> images = repository.findById(id).orElse(null).getImages();
             images.forEach(image -> {
                 String fileRoot = imgfolderpath;
@@ -79,7 +87,7 @@ class BoardAPIController {
             });
             repository.deleteById(id);
 
-        }catch(NullPointerException e){
+        }catch(Exception e){ //NullpointerException and NoSuchElementException and SecurityException
 
         }
 

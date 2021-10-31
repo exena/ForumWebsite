@@ -64,7 +64,7 @@
         </div>
         <div class="form-group" id="FormBody">
             <!--This textarea will not be shown to user. (Quill adds bootstrap d-none class)-->
-            <textarea name="input" class="quill-editor" th:field="*{content}">
+            <textarea id="QuillTextarea" name="input" class="quill-editor" th:field="*{content}">
                 <p>Hello World!</p>
             </textarea>
         </div>
@@ -83,10 +83,8 @@
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<!--<script src="/image-resize.min.js"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/quill-blot-formatter@1.0.5/dist/quill-blot-formatter.min.js"></script>-->
-<!--<script src="/quill-blot-formatter.min.js"></script>-->
-<script src="/quill-config.js"></script>
+<!--<script src="/js/quill-blot-formatter.min.js"></script>-->
+<script src="/js/quill-config.js"></script>
 <script>
 // summernote : 'note-editor'
 // quill: 'ql-editor'
@@ -125,6 +123,9 @@ function submitForm()
     }
     //이미지를 업로드해야하는 경우.
     else{
+        //일단 textarea 갱신.
+        const channel = new BroadcastChannel('channel1');
+        channel.postMessage('Let me in');
         //수정이 아닌 경우. (새로 글을 쓰는 경우)
         //일단 content를 null로 해서 제목만 보내고
         if(document.getElementById('formId').value == ''){
@@ -190,6 +191,7 @@ function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
     data.append("file", uploadableImage, imgElement.getAttribute('alt'));
     data.append("formId", formId);
     $.ajax({
+        headers:{"[[${_csrf.headerName}]]":"[[${_csrf.token}]]"},
         data : data,
         type : "POST",
         url : "/uploadSummernoteImageFile",

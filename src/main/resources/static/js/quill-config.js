@@ -27,7 +27,7 @@
 //Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 //class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
 //    getActions() {
-//        return [QuillBlotFormatter.AlignAction];//, QuillBlotFormatter.ResizeAction
+//        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
 //    }
 //}
 //**********************************************************************************************
@@ -44,23 +44,21 @@ $('.quill-editor').each(function(i, el) {//index, element
     el.parent().append(div);
 
     var quill = new Quill('#' + id, {
-        modules:{ toolbar: '#toolbar'},
+        modules:{ toolbar: '#toolbar'},//, blotFormatter: { specs: [ CustomImageSpec ] }
         theme: 'snow'
     });
 //    quill.on('text-change', function() {
 //        el.html(quill.root.innerHTML);
 //    });
 //**********************************************************************************************
-// edit board with textarea quill
+// edit(ex:PutMapping) board with textarea quill
 //    console.log(el.text());
 //    const value = `<h1>New content here</h1>`;
     const delta = quill.clipboard.convert(el.text());
     quill.setContents(delta, 'silent');
 //    quill.clipboard.dangerouslyPasteHTML(el.html());
 //**********************************************************************************************
-    quill.on('text-change', function() {
-        el.html(quill.root.innerHTML);
-    });
+//
 //**********************************************************************************************
 // image input handler
     quill.getModule('toolbar').addHandler('image', function() {
@@ -97,6 +95,12 @@ $('.quill-editor').each(function(i, el) {//index, element
         el.html(quill.root.innerHTML);
         alert("pause");
     });
-
+//**********************************************************************************************
+//custom applying change
+    const channel = new BroadcastChannel('channel1');
+    channel.addEventListener('message', (event) => {
+        //received.textContent = event.data;
+        el.html(quill.root.innerHTML);
+    });
 });
 //**********************************************************************************************

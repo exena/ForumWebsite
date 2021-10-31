@@ -8,6 +8,7 @@ group = 'gameinfoweb'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+
 repositories {
 	mavenCentral()
 }
@@ -25,8 +26,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4"
 	implementation 'commons-io:commons-io:2.6'
-	implementation 'com.google.code.gson:gson:2.7'
+	implementation 'com.google.code.gson:gson'
 	implementation 'commons-fileupload:commons-fileupload:1.4'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-test'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.5.RELEASE'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-storage', version: '1.2.5.RELEASE'
 }

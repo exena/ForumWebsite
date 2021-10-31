@@ -1,5 +1,7 @@
 package gameinfoweb.gameinfo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,4 +23,9 @@ public class Board {
 
     @OneToMany(mappedBy = "board")
     private List<Image> images = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="user_id", referencedColumnName = "id") //뒤의 refCol은 PK면 생략 가능.
+    @JsonIgnore
+    private User user;
 }
