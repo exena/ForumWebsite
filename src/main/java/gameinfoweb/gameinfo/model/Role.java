@@ -1,7 +1,7 @@
 package gameinfoweb.gameinfo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+import gameinfoweb.gameinfo.excludeannotation.Exclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,6 +19,7 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
+    @Exclude
     private List<User> users;
 
 }

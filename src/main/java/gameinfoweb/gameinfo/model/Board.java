@@ -1,7 +1,7 @@
 package gameinfoweb.gameinfo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+import gameinfoweb.gameinfo.excludeannotation.Exclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -27,5 +27,6 @@ public class Board {
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id") //뒤의 refCol은 PK면 생략 가능.
     @JsonIgnore
+    @Exclude
     private User user;
 }

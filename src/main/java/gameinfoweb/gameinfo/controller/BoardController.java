@@ -1,7 +1,9 @@
 package gameinfoweb.gameinfo.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import gameinfoweb.gameinfo.excludeannotation.AnnotationExclusionStrategy;
 import gameinfoweb.gameinfo.model.Board;
 import gameinfoweb.gameinfo.repository.BoardRepository;
 import gameinfoweb.gameinfo.service.BoardService;
@@ -63,11 +65,13 @@ public class BoardController {
     public JsonObject prepost(@Valid Board board, BindingResult bindingResult, Authentication authentication){
         JsonObject jsonObject = new JsonObject();
         try {
-            Board b = boardRepository.findById(board.getId()).orElseThrow();
-            String bn = b.getUser().getUsername();
-            String n = authentication.getName();
-            if (!n.equals(bn)) {
-                throw new SecurityException("Different username");
+            if(board.getId()!=null) {
+                Board b = boardRepository.findById(board.getId()).orElseThrow();
+                String bn = b.getUser().getUsername();
+                String n = authentication.getName();
+                if (!n.equals(bn)) {
+                    throw new SecurityException("Different username");
+                }
             }
             if(bindingResult.hasErrors()){
                 throw new Exception("Too long or too short");
@@ -78,7 +82,8 @@ public class BoardController {
         }
         Board savedBoard = boardService.save(authentication.getName(),board);
         jsonObject.addProperty("responseCode", "success");
-        jsonObject.addProperty("savedBoard", new Gson().toJson(savedBoard));
+        Gson gson = new GsonBuilder().setExclusionStrategies(new AnnotationExclusionStrategy()).create();
+        jsonObject.addProperty("savedBoard", gson.toJson(savedBoard));
         return jsonObject;
     }
 

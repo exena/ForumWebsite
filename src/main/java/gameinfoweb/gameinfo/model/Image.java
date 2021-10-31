@@ -1,7 +1,7 @@
 package gameinfoweb.gameinfo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+import gameinfoweb.gameinfo.excludeannotation.Exclude;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,5 +18,6 @@ public class Image {
     @ManyToOne
     @JoinColumn(name="board_id", referencedColumnName = "id")
     @JsonIgnore
+    @Exclude
     private Board board;
 }
