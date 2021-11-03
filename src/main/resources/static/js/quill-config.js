@@ -24,12 +24,12 @@
 //Quill.register(Image, true);
 //**********************************************************************************************
 //image resizer module
-//Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
-//class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
-//    getActions() {
-//        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
-//    }
-//}
+Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
+class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
+    getActions() {
+        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
+    }
+}
 //**********************************************************************************************
 //var quill = new Quill('#editor', {
 //    //modules:{ toolbar: [ ['image','code-block'] ] },
@@ -37,14 +37,15 @@
 //    theme: 'snow'
 //});
 //textarea quill editor
+var quill;
 $('.quill-editor').each(function(i, el) {//index, element
     var el = $(this), id = 'quilleditor-' + i, val = el.val(), editor_height = '100%';
     var div = $('<div/>').attr('id', id).css('height', editor_height).css('font-size', '16px').html(val);
     el.addClass('d-none');
     el.parent().append(div);
 
-    var quill = new Quill('#' + id, {
-        modules:{ toolbar: '#toolbar'},//, blotFormatter: { specs: [ CustomImageSpec ] }
+    quill = new Quill('#' + id, {
+        modules:{ toolbar: '#toolbar', blotFormatter: { specs: [ CustomImageSpec ] }},
         theme: 'snow'
     });
 //    quill.on('text-change', function() {
@@ -80,7 +81,7 @@ $('.quill-editor').each(function(i, el) {//index, element
                 readerArr[i] = new FileReader();
                 readerArr[i].onload = function(){
                     var index = readerArr.indexOf(this);
-                    quill.pasteHTML(range.index, `<img src="${readerArr[index].result}" class="img-fluid" filename="${fileArr[index].name}" alt="${fileArr[index].name}">`);
+                    quill.pasteHTML(range.index, `<img src="${readerArr[index].result}" filename="${fileArr[index].name}" alt="${fileArr[index].name}">`);
                     //quill.insertEmbed(range.index, 'imageBlot', {src: readerArr[index].result, customfilename: fileArr[index].name}, 'user');
                     //quill.setSelection(++range.index);
                 };
@@ -93,7 +94,6 @@ $('.quill-editor').each(function(i, el) {//index, element
 //onsubmit applying change
     document.getElementById('EntireForm').addEventListener('submit', function(){
         el.html(quill.root.innerHTML);
-        alert("pause");
     });
 //**********************************************************************************************
 //custom applying change

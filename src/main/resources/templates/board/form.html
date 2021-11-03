@@ -11,7 +11,7 @@
     <form action="#" th:action="@{/board/form}" th:object="${board}" method="post" id="EntireForm">
         <input type="hidden" th:field="*{id}" id="formId">
         <!--<input type="hidden" th:field="*{images}" id="ImagesList">-->
-        <div id="toolbar">
+        <div id="toolbar"  class="sticky-top" style="background-color:white;">
             <!-- Add font size dropdown -->
             <span class="ql-formats">
                 <select class="ql-font"></select>
@@ -74,7 +74,13 @@
         </div>
     </form>
 </div>
-
+<!--얘네가 맨 아래에 있어야 제일 앞에 보임-->
+<div class='backLayer'> </div>
+<div id = "loadingDiv">
+    <div style="width:50px; height:50px;"><div class="loader"></div></div>
+    <div style="height:10px;"></div>
+    <progress value="0" max="100" style="width:80%;"></progress>
+</div>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -83,7 +89,8 @@
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<!--<script src="/js/quill-blot-formatter.min.js"></script>-->
+<script src="/js/quill-blot-formatter.min.js"></script>
+<script src="/js/loading-screen.js"></script>
 <script src="/js/quill-config.js"></script>
 <script>
 // summernote : 'note-editor'
@@ -123,20 +130,31 @@ function submitForm()
     }
     //이미지를 업로드해야하는 경우.
     else{
+        //화면 가리기
+        showLoadingScreen();
         //일단 textarea 갱신.
         const channel = new BroadcastChannel('channel1');
-        channel.postMessage('Let me in');
+        channel.postMessage('갱신! 갱신!');
         //수정이 아닌 경우. (새로 글을 쓰는 경우)
         //일단 content를 null로 해서 제목만 보내고
         if(document.getElementById('formId').value == ''){
             var form = document.getElementById('EntireForm');
             var formData = $(form).serialize();
             formData = formData.split("&content=")[0];
+            var $progress = $("#loadingDiv").find("progress");
             $.ajax({
                 cache : false,
                 url : "/board/prepost",
                 type : 'POST',
                 data : formData,
+                xhr: function() {
+                    var xhr = $.ajaxSettings.xhr();
+                    xhr.upload.onprogress = function(e){
+                        var percent = e.loaded * 100 / e.total;
+                        $progress.val(percent);
+                    };
+                    return xhr;
+                },
                 success : function(data) {
                     //게시글 id를 받은후 이미지를 업로드하면서 id와 함께 데이터베이스에 보내서 맵핑한다.
                     var board = JSON.parse(data.savedBoard)
