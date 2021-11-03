@@ -27,7 +27,7 @@
 Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 class CustomImageSpec extends QuillBlotFormatter.ImageSpec {
     getActions() {
-        return [QuillBlotFormatter.AlignAction, QuillBlotFormatter.ResizeAction];
+        return [QuillBlotFormatter.AlignAction];
     }
 }
 //**********************************************************************************************
