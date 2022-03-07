@@ -43,7 +43,7 @@
             <li class="page-item" th:classappend="${i == boards.pageable.pageNumber + 1}? 'disabled'" th:each="i: ${#numbers.sequence(startPage,endPage)}">
                 <a class="page-link" th:href="@{/board/list(page=${i})}" th:text="${i}">1</a>
             </li>
-            <li class="page-item" th:classappend="${boards.totalPages == endPage}? 'disabled'">
+            <li class="page-item" th:classappend="${boards.totalPages == endPage || boards.totalPages == 0 }? 'disabled'">
                 <a class="page-link" th:href="@{/board/list(page=(${boards.pageable.pageNumber + 6}>${boards.totalPages})? ${boards.totalPages} : ${boards.pageable.pageNumber + 6})}">Next</a>
             </li>
         </ul>

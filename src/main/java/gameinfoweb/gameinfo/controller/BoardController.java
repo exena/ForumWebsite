@@ -34,6 +34,8 @@ public class BoardController {
         Page<Board> boards = boardRepository.findAll(pageable);
         int startPage = Math.max(1, boards.getPageable().getPageNumber() / 5 * 5 + 1);
         int endPage = Math.min(boards.getTotalPages(), startPage + 4);
+        if(endPage == 0)
+            endPage = 1;
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         model.addAttribute("boards", boards);

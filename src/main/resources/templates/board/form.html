@@ -139,9 +139,11 @@ function submitForm()
         //일단 content를 null로 해서 제목만 보내고
         if(document.getElementById('formId').value == ''){
             var form = document.getElementById('EntireForm');
-            var formData = $(form).serialize();
-            formData = formData.split("&content=")[0];
+            var dummyForm = $(form).clone();
+            dummyForm.children('#FormBody').remove();//컨텐트 없애기.
+            var formData = $(dummyForm).serialize();
             var $progress = $("#loadingDiv").find("progress");
+            //alert("1");
             $.ajax({
                 cache : false,
                 url : "/board/prepost",
@@ -156,6 +158,7 @@ function submitForm()
                     return xhr;
                 },
                 success : function(data) {
+                    //alert("2");
                     //게시글 id를 받은후 이미지를 업로드하면서 id와 함께 데이터베이스에 보내서 맵핑한다.
                     var board = JSON.parse(data.savedBoard)
                     document.getElementById('formId').value = board.id;
