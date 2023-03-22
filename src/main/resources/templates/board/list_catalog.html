@@ -10,10 +10,10 @@
 <div class="container">
     <h2>게시판</h2>
     <div class="cards-container">
-        <div th:each="board : ${boards}" th:href="@{'/board/'+${board.id}}" class="card">
+        <div th:each="board : ${boards}" class="card">
             <img class="card-img-top" th:src="${board.getThumbnailImage()}?
             @{${@environment.getProperty('image-src-url')}+${board.getThumbnailImage().fileName}} : @{${@environment.getProperty('image-src-url')}+'default_image.png'}">
-            <div class="card-body">
+            <div class="card-body" th:href="@{'/board/'+${board.id}}">
                 <h5 th:text="${board.title}" class="card-title">Card title</h5>
                 <p th:text="${board.content}" class="card-text">Some quick example text</p>
                 <span th:text="${board.user.username}"> 작성자이름오는곳 </span>
