@@ -10,7 +10,7 @@
 <div class="container">
     <h2>게시판</h2>
     <div class="cards-container">
-        <div th:each="board : ${boards}" th:href="@{'/board/'+${board.id}}" th:href="@{'/board/'+${board.id}}" class="card">
+        <div th:each="board : ${boards}" th:href="@{'/board/'+${board.id}}" class="card">
             <img class="card-img-top" th:src="${board.getThumbnailImage()}?
             @{${@environment.getProperty('image-src-url')}+${board.getThumbnailImage().fileName}} : @{${@environment.getProperty('image-src-url')}+'default_image.png'}">
             <div class="card-body">
