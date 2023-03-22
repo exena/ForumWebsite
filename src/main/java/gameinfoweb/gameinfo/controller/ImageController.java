@@ -25,7 +25,7 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/summernoteImage")
+@RequestMapping("/${image-src-url}")
 public class ImageController {
 
     @Value("${image-folder-path}")

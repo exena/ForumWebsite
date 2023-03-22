@@ -29,4 +29,13 @@ public class Board {
     @JsonIgnore
     @Exclude
     private User user;
+
+    public Image getThumbnailImage(){
+        for(Image img:images){
+            if(img.getFileName().matches("^s_.+")){
+                return img;
+            }
+        }
+        return null;
+    }
 }

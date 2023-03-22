@@ -14,8 +14,19 @@
         <div id="toolbar"  class="sticky-top" style="background-color:white;">
             <!-- Add font size dropdown -->
             <span class="ql-formats">
-                <select class="ql-font"></select>
-                <select class="ql-size"></select>
+                <select class="ql-size">
+                    <option value="0.56rem">-5단계</option>
+                    <option value="0.583rem">-4단계</option>
+                    <option value="0.668rem">-3단계</option>
+                    <option value="0.75rem">-2단계</option>
+                    <option value="0.833rem">-1단계</option>
+                    <option value="0.9rem">기본</option>
+                    <option value="1.16rem">1단계</option>
+                    <option value="1.25rem">2단계</option>
+                    <option value="1.332rem">3단계</option>
+                    <option value="1.417rem">4단계</option>
+                    <option value="1.5rem">5단계</option>
+                </select>
             </span>
             <!-- Add a bold button -->
             <span class="ql-formats">
@@ -96,6 +107,7 @@
 // summernote : 'note-editor'
 // quill: 'ql-editor'
 var editable_part_class_name = 'ql-editor';
+var image_folder_name = '/summernoteImage/';
 
 
 //이미지 배열을 리턴
@@ -168,7 +180,7 @@ function submitForm()
                         //if image is not a url link
                         if(img.src.substr( 0, 5) == 'data:'){
                             const uploadableImage = DataURIToBlob(img.src);
-                            uploadSummernoteImageFile(uploadableImage, img, board.id);
+                            uploadImageFile(uploadableImage, img, board.id);
                         }
                     });
                 },
@@ -186,7 +198,7 @@ function submitForm()
                 //if image is not a url link
                 if(img.src.substr( 0, 5) == 'data:'){
                     const uploadableImage = DataURIToBlob(img.src);
-                    uploadSummernoteImageFile(uploadableImage, img, id);
+                    uploadImageFile(uploadableImage, img, id);
                 }
             });
         }
@@ -207,7 +219,7 @@ function DataURIToBlob(dataURI) {
 }
 
 //이미지업로드함수. 모든 이미지가 업로드된 경우엔 제출submit요청을 보냄.
-function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
+function uploadImageFile(uploadableImage, imgElement, formId) {
     data = new FormData();
     data.append("file", uploadableImage, imgElement.getAttribute('alt'));
     data.append("formId", formId);
@@ -215,17 +227,35 @@ function uploadSummernoteImageFile(uploadableImage, imgElement, formId) {
         headers:{"[[${_csrf.headerName}]]":"[[${_csrf.token}]]"},
         data : data,
         type : "POST",
-        url : "/uploadSummernoteImageFile",
+        url : "/uploadImageFile",
         contentType : false,
         enctype : 'multipart/form-data',
         processData : false,
         success : function(data) {
             imgElement.src = data.url;
             if(getImgs2ConvNum()==0){
+                makeThumbnail();
                 document.getElementById('EntireForm').requestSubmit();
             }
         }
         //error:
+    });
+}
+//섬네일용으로 원본 이미지의 축소판 이미지를 업로드하는 함수.
+function makeThumbnail(){
+    var formId = document.getElementById('formId').value;
+    data = new FormData();
+    data.append("formId", formId);
+    //이미지의 src에 있는 링크의 경로를 뺀 파일명 부분만 가져온다. 보안상 문제있을 가능성 있음.
+    var fileName = getImgArray()[0].getAttribute('src').split('/').at(-1);
+    data.append("name", fileName);
+    $.ajax({
+        headers:{"[[${_csrf.headerName}]]":"[[${_csrf.token}]]"},
+        data : data,
+        type : "POST",
+        url : "/uploadThumbnailFile",
+        contentType : false, //enctype : 'multipart/form-data',
+        processData : false
     });
 }
 </script>

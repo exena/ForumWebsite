@@ -23,6 +23,11 @@
 //Image.className = 'img-fluid';
 //Quill.register(Image, true);
 //**********************************************************************************************
+//custom font size
+var Size = Quill.import('attributors/style/size');
+Size.whitelist = ['0.56rem','0.583rem','0.668rem','0.75rem','0.833rem','0.9rem','1.16rem','1.25rem','1.332rem','1.417rem','1.5rem'];
+Quill.register(Size, true);
+//**********************************************************************************************
 //image resizer module
 Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 class CustomImageSpec extends QuillBlotFormatter.ImageSpec {

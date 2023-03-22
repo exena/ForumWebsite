@@ -38,3 +38,26 @@ div#loadingDiv{
     max-width:100%;
     max-height: 56vw;
 }
+.card{
+  width: 12rem;
+  margin: 0.5em;
+}
+.card img{
+  height: 6rem;
+  object-fit: contain;
+}
+.card-text {
+  height: 6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* 여러 줄 자르기 추가 스타일 */
+  white-space: normal;
+  line-height: 1.2em;
+  height: 3.6em;
+  text-align: left;
+  word-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}

@@ -29,6 +29,19 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
+    @GetMapping("/list_catalog")
+    public String list_catalog(Model model, @PageableDefault(size = 20) Pageable pageable) {
+        Page<Board> boards = boardRepository.findAll(pageable);
+        int startPage = Math.max(1, boards.getPageable().getPageNumber() / 5 * 5 + 1);
+        int endPage = Math.min(boards.getTotalPages(), startPage + 4);
+        if(endPage == 0)
+            endPage = 1;
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("boards", boards);
+        return "board/list_catalog";
+    }
+
     @GetMapping("/list")
     public String list(Model model, @PageableDefault(size = 20) Pageable pageable) {
         Page<Board> boards = boardRepository.findAll(pageable);
