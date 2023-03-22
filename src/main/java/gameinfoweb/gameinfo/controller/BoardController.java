@@ -29,7 +29,7 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
-    @GetMapping("/list_catalog")
+    @GetMapping("/catalog-list")
     public String list_catalog(Model model, @PageableDefault(size = 20) Pageable pageable) {
         Page<Board> boards = boardRepository.findAll(pageable);
         int startPage = Math.max(1, boards.getPageable().getPageNumber() / 5 * 5 + 1);
@@ -54,7 +54,6 @@ public class BoardController {
         model.addAttribute("boards", boards);
         return "board/list";
     }
-
     @GetMapping("/form")
     public String form(Model model, @RequestParam(required = false) Long id, Authentication authentication) {
         if (id == null) {
