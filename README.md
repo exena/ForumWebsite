@@ -1,5 +1,5 @@
 #사진을 올릴 수 있는 게시판
-![image](https://github.com/exena/ForumWebsite/assets/22702278/4ca1cf41-2d69-4c6c-b2e7-78c43ace19aa)
+![image](https://github.com/exena/ForumWebsite/assets/22702278/0d04118f-0021-44fe-aebb-2ce835b06703)
 
 ##제작과정
 - 백엔드는 Java Spring Boot 와 MariaDB를 사용했습니다.
